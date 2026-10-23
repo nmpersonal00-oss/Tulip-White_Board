@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<meta name="theme-color" content="#b8a1c3"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Tulip Board"/>
+<link rel="manifest" href="manifest.webmanifest"/>
+<link rel="apple-touch-icon" href="icons/icon-192.png"/>
+<title>Tulip Board · Your creative whiteboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&amp;family=Comfortaa:wght@600&amp;family=Cormorant+Garamond:wght@600&amp;family=Dancing+Script:wght@500;700&amp;family=DM+Sans:wght@600&amp;family=Great+Vibes&amp;family=Indie+Flower&amp;family=Kalam:wght@400;700&amp;family=Nunito:wght@600&amp;family=Pacifico&amp;family=Playfair+Display:wght@600&amp;family=Quicksand:wght@600&amp;family=Sacramento&amp;display=swap" rel="stylesheet"/>
+<style>
+:root{--ui:#55435e;--uimut:#85738b;--pink:#e8adc9;--lav:#c9b2f2;--line:rgba(100,75,110,.13);--frost:rgba(255,248,252,.87);--shadow:0 12px 45px rgba(43,29,57,.14);--focus:#9870c0}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden}body{font:14px/1.3 -apple-system,BlinkMacSystemFont,"Avenir Next","Segoe UI",sans-serif;color:var(--ui);background:#f7f0ef}button,input,select{font:inherit}button{cursor:pointer;-webkit-tap-highlight-color:transparent}button:focus-visible,input:focus-visible{outline:3px solid #ac88d4;outline-offset:2px}button[disabled]{opacity:.37;cursor:not-allowed}button:active{transform:scale(.96)}.hidden{display:none!important}.sr{position:absolute;clip:rect(0,0,0,0);width:1px;height:1px;overflow:hidden;white-space:nowrap}
+#surface{position:fixed;inset:0;overflow:hidden;touch-action:none}#board{position:absolute;width:100%;height:100%;display:block;touch-action:none;cursor:crosshair}#surface.mode-move #board{cursor:default}.floating{position:fixed;z-index:4;backdrop-filter:blur(24px) saturate(130%);-webkit-backdrop-filter:blur(24px) saturate(130%);background:var(--frost);border:1px solid rgba(255,255,255,.9);box-shadow:var(--shadow)}
+.topbar{top:max(13px,env(safe-area-inset-top));left:50%;transform:translateX(-50%);height:52px;padding:6px;border-radius:20px;display:flex;align-items:center;gap:5px;max-width:calc(100vw - 105px)}.topbar button,.toolbar button,.panel button,.mobile-more{color:var(--ui);border:0;background:transparent;border-radius:12px;min-width:36px;min-height:36px;display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:6px 10px}.topbar button:hover,.toolbar button:hover,.panel button:hover{background:rgba(174,140,195,.13)}.topbar button.selected,.toolbar button.selected,.panel button.selected{background:rgba(198,162,226,.3);color:#6c458b}.divider{height:22px;width:1px;background:rgba(75,52,88,.14);margin:0 3px}.word{font-weight:650;font-size:13px;white-space:nowrap}.board-toggle{background:rgba(255,255,255,.58)!important;padding:6px 13px!important;border:1px solid rgba(144,114,160,.1)!important}.board-toggle.selected{background:#e9d3f4!important}.title-crest{position:fixed;left:19px;top:max(18px,env(safe-area-inset-top));z-index:3;display:flex;gap:8px;align-items:center;font-weight:800;color:#82628d;letter-spacing:.02em;font-size:16px;pointer-events:none;text-shadow:0 1px 0 rgba(255,255,255,.4)}.title-crest .mark{width:31px;height:31px;border-radius:12px;background:linear-gradient(150deg,#f8cfe2,#d6cafc);display:grid;place-items:center;font-size:17px;box-shadow:0 6px 14px #845b9c19}
+.toolbar{left:max(12px,env(safe-area-inset-left));top:50%;transform:translateY(-50%);width:118px;padding:8px;border-radius:24px;display:flex;flex-direction:column;gap:7px;max-height:calc(100dvh - 130px);overflow-y:auto;overscroll-behavior:contain}.toolbar button{height:46px;font-size:18px;padding:7px 10px;border-radius:15px;justify-content:flex-start;width:100%}.toolbar button span.ico{line-height:1}.toolbar button.selected{box-shadow:inset 0 0 0 1px #a689c4a6;background:rgba(198,162,226,.24)}.compact-tools .tool-name{font-size:12px;font-weight:780;letter-spacing:.01em;line-height:1.1}.toolbar .sidebar-btn{display:flex;align-items:center;gap:9px}.toolbar .sidebar-btn .mini{font-size:16px;line-height:1;min-width:18px;text-align:center}.toolbar .sidebar-btn.hide-ui{margin-top:2px}.toolbar .sidebar-btn.hide-ui .mini{font-size:15px}.brush-kind{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.brush-kind button{min-height:39px;background:#fff9fdd0;border:1px solid #d8c6df78!important;border-radius:13px!important;font-weight:700;font-size:12px!important}.brush-kind button.selected{background:#ead5f1}.brush-subhead{font-size:11px;line-height:1.4;color:#8f7898;margin-top:6px}.slider-group input[type=range]{height:26px}.soft-divider{height:1px;background:#d9cbdd76;margin:17px 0}.palette-panel-heading{margin-top:14px}.toolbar .selected .tool-name{color:#795294}.action-stack{display:grid;gap:9px}.action-stack button{justify-content:flex-start!important;font-size:13px!important;min-height:42px;height:auto;padding:10px 12px!important;background:#fff9fdd0!important;border:1px solid #d8c6df78!important;border-radius:14px!important}.action-stack button.dangerbutton{background:#f7dde6!important}
+.panel{position:fixed;right:max(14px,env(safe-area-inset-right));top:82px;bottom:82px;width:min(342px,calc(100vw - 100px));z-index:8;display:flex;flex-direction:column;padding:14px;border-radius:23px;overflow:hidden}.panel-header{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px}.panel h2{font-size:17px;margin:0;font-weight:800;color:#705579}.panel-sub{font-size:12px;color:#8d7994;margin:0 0 12px}.scroll{overflow:auto;min-height:0;padding-right:2px;-webkit-overflow-scrolling:touch}.section-label{font-size:11px;font-weight:800;letter-spacing:.11em;text-transform:uppercase;color:#967d9d;margin:17px 0 9px}.section-label:first-child{margin-top:0}.colors{display:grid;grid-template-columns:repeat(8,1fr);gap:8px}.color-swatch{width:30px;height:30px;min-width:0!important;min-height:0!important;border-radius:50%!important;padding:0!important;border:2px solid rgba(255,255,255,.95)!important;box-shadow:0 2px 5px #604b6a17,0 0 0 1px #8b758529;position:relative}.color-swatch.selected:after{content:'✓';position:absolute;inset:0;display:grid;place-items:center;font-size:17px;color:#fff;text-shadow:0 1px 4px #0008}.color-swatch.pale.selected:after{color:#563a6c;text-shadow:none}.slider-group{display:grid;gap:7px;margin:14px 1px}.slider-row{display:flex;justify-content:space-between;align-items:center;color:#786183;font-size:13px}.slider-group input{width:100%;accent-color:#a783c6}.chiprow{display:flex;gap:7px;flex-wrap:wrap}.chiprow button{font-size:12px!important;font-weight:700;background:#ffffff7c;border:1px solid #d8c6df78!important;padding:7px 10px!important;min-height:32px!important}.chiprow button.selected{background:#e5d0ec}.stickers-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.sticker-cell{height:92px;border-radius:17px!important;background:rgba(255,255,255,.62)!important;border:1px solid #e5d6e5!important;display:flex!important;flex-direction:column;gap:3px!important;padding:4px!important}.sticker-cell img{height:60px;width:68px;object-fit:contain}.sticker-cell span{font-size:10px;color:#785e81}.sticker-cell.selected{outline:2px solid #b991d8}
+.icon-row{display:flex;align-items:center;gap:9px}.icon-row p{margin:0;font-size:12px;color:#87758d}.subtle{font-size:12px;color:#8b7990;line-height:1.5}.kbd{border:1px solid #d5bfd9;border-radius:5px;padding:1px 4px;font-size:11px;background:#ffffffaa}.smallbutton{background:#ead9ee!important;font-weight:700!important;border:1px solid #cdb5dc66!important}.dangerbutton{background:#f7dde6!important;color:#ad5571!important}.image-zone{border:1.5px dashed #c0a1cd;border-radius:16px;padding:22px 12px;text-align:center;background:#ffffff77;line-height:1.6;color:#846990}.image-zone strong{display:block;color:#755982}.image-zone button{margin-top:9px;background:#dfc5eb}.show-ui-btn{position:fixed;left:16px;top:max(16px,env(safe-area-inset-top));z-index:12;width:34px;height:34px;border-radius:12px;border:1px solid rgba(144,114,160,.16);background:rgba(255,248,252,.92);box-shadow:0 8px 22px rgba(43,29,57,.12);color:#7b5b87;display:grid;place-items:center;font-size:17px}.show-ui-btn:hover{background:#fff}.show-ui-btn.hidden{display:none!important}
+.toast{position:fixed;z-index:20;bottom:20px;left:50%;transform:translateX(-50%);padding:11px 17px;border-radius:16px;background:#54405de8;color:white;box-shadow:0 12px 35px #2f193c42;font-weight:600;font-size:13px;pointer-events:none;opacity:0;transition:opacity .2s;max-width:90vw;text-align:center}.toast.show{opacity:1}
+.modalback{position:fixed;inset:0;background:#20182c77;z-index:15;display:grid;place-items:center;padding:16px}.modal{background:#fff8fc;border-radius:24px;padding:22px;width:min(430px,100%);max-height:calc(100dvh - 32px);overflow:auto;box-shadow:0 24px 90px #24132a50}.modal h2{margin:0 0 10px;color:#6c4f7f;font-size:20px}.modal p{line-height:1.55;color:#7c6c82}.modal-actions{display:flex;gap:9px;justify-content:flex-end;margin-top:18px}.modal button{border:0;border-radius:12px;padding:10px 13px;background:#e7d8ee;color:#5e4770;font-weight:750}.modal button.danger{background:#f0c4d4;color:#8f405a}.modal .text-label{display:block;font-size:13px;font-weight:750;color:#71557d;margin:12px 0 6px}.modal textarea,.modal input[type=color],.modal input[type=range]{font:inherit}.modal textarea{display:block;width:100%;min-height:126px;resize:vertical;border:1.5px solid #d6bfdc;border-radius:14px;padding:12px;background:#fffefd;color:#543c60;line-height:1.45}.modal textarea:focus{outline:2px solid #bb96ce;outline-offset:2px}.modal .text-options{display:flex;align-items:center;gap:16px;margin:14px 0 4px}.modal .text-options label{display:flex;flex-direction:column;flex:1;gap:5px;font-size:12px;font-weight:700;color:#735d7e}.modal .text-options input[type=color]{width:57px;height:38px;border:1px solid #d8bfdf;border-radius:10px;background:#fff;cursor:pointer}.modal .text-options input[type=range]{width:100%;accent-color:#9870bc}.modal button.primary{background:#e3c8f0;color:#684a80}.modal .hint{font-size:12px;color:#87728e;margin:12px 0 0}
+#dropzone{position:fixed;inset:10px;border:3px dashed #b691d7;border-radius:25px;z-index:10;pointer-events:none;background:#d9c4eb77;display:none;place-items:center;font-size:24px;font-weight:800;color:#674c7b;text-shadow:0 1px white}#dropzone.active{display:grid}#board.chalk{background:#1d2a30}
+/* Tablet: keep the board nearly edge-to-edge and controls modest */
+@media(max-width:800px){.title-crest{display:none}.topbar{top:max(11px,env(safe-area-inset-top));max-width:calc(100vw - 12px);height:47px}.topbar button{padding:5px 9px;min-width:30px}.topbar .word{font-size:12px}.toolbar{left:8px;padding:7px;width:108px;border-radius:17px;max-height:calc(100dvh - 108px)}.toolbar button{height:42px;padding:6px 8px}.panel{right:8px;top:65px;bottom:70px;width:min(320px,calc(100vw - 74px))}}
+@media(max-width:500px){.toolbar button{height:40px;font-size:16px}.toolbar{width:98px;top:51%;gap:5px;max-height:calc(100dvh - 90px);padding:6px}.topbar .optional{display:none}.topbar{gap:1px}.topbar button{font-size:12px;min-width:31px;padding:5px 7px}.panel{width:calc(100vw - 58px)}}
+
+/* V5.2: a quiet, one-column action rail. Editing has no pop-up. */
+.toolbar{width:143px;gap:3px;padding:9px;max-height:calc(100dvh - 108px)}
+.toolbar button.sidebar-btn{min-height:42px;height:42px;justify-content:flex-start;gap:8px;padding:6px 9px;font-size:15px;flex-shrink:0}
+.toolbar .sidebar-btn .mini{font-size:17px;min-width:19px}
+.toolbar .sidebar-btn .tool-name{font-size:11.5px;white-space:nowrap;line-height:1.1}
+.toolbar .sidebar-divider{height:1px;flex-shrink:0;margin:4px 7px;background:rgba(154,116,167,.22)}
+.toolbar .danger-action{color:#ad667f}
+.toolbar .danger-action:hover{background:rgba(239,182,206,.22)}
+.toolbar button[disabled]{opacity:.35}
+@media(max-width:800px){.toolbar{width:140px;padding:7px;gap:2px;max-height:calc(100dvh - 90px)}.toolbar button.sidebar-btn{height:39px;min-height:39px;padding:5px 8px}}
+@media(max-width:500px){.toolbar{width:128px}.toolbar .sidebar-btn .tool-name{font-size:10.5px}.toolbar button.sidebar-btn{height:37px;min-height:37px}}
+
+/* Version 5.3: text stationery options. The board stays visible beside the editor on iPad. */
+.words-modalback{align-items:center;justify-items:end;padding-right:clamp(16px,3vw,40px);background:rgba(32,24,44,.28)}
+.words-modalback .modal{width:min(430px,calc(100vw - 24px));padding:19px 20px;max-height:min(780px,calc(100dvh - 30px))}
+.words-modalback .modal p{margin:7px 0}
+.font-gallery{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;max-height:194px;overflow-y:auto;padding:4px 2px 5px;-webkit-overflow-scrolling:touch}
+.font-choice{height:58px;text-align:left;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:2px;background:#fcf5fb!important;border:1px solid #e3d0e8!important;padding:7px 10px!important}
+.font-choice .font-sample{display:block;font-size:21px;line-height:1.07;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+.font-choice .font-name{display:block;font-size:10px;font-weight:650;color:#826789}
+.font-choice.active{border-color:#b18bca!important;box-shadow:inset 0 0 0 1px #b18bca;background:#f1e5f8!important}
+.words-preview{margin-top:9px;min-height:56px;max-height:100px;overflow:hidden;border:1px dashed #d6bedf;background:#fffafb;color:#73517f;border-radius:15px;padding:10px 12px;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.25}
+.words-help{font-size:11px;color:#816b86;margin:8px 0!important}
+.words-modalback .modal textarea{min-height:88px;max-height:170px}
+@media(max-width:720px){.words-modalback{justify-items:center;padding:12px;background:rgba(32,24,44,.4)}.words-modalback .modal{max-height:calc(100dvh - 22px)}.font-gallery{max-height:145px}.font-choice{height:49px}.words-modalback .modal textarea{min-height:75px}}
+
+/* Genuine distraction-free drawing mode. Drawing gestures never affect visibility. */
+body.focus-drawing .topbar,
+body.focus-drawing .toolbar,
+body.focus-drawing .title-crest,
+body.focus-drawing #panel { display:none !important; }
+body:not(.focus-drawing) #showUiBtn { display:none !important; }
+body.focus-drawing #showUiBtn { display:grid !important; }
+.show-ui-btn { width:38px;height:38px;touch-action:manipulation; }
+</style>
+</head>
+<body>
+<div id="surface"><canvas id="board" aria-label="Drawing board. Use Apple Pencil, stylus, touch, or mouse."></canvas></div>
+<div class="title-crest"><div class="mark">🌷</div><div>Tulip Board</div></div>
+<div class="floating topbar" aria-label="Board and paper controls">
+<button class="board-toggle selected" data-board="white" title="Whiteboard">◻ <span class="word">Whiteboard</span></button>
+<button class="board-toggle" data-board="chalk" title="Chalkboard">▣ <span class="word">Chalkboard</span></button>
+<span class="divider"></span>
+<button id="paperBtn" title="Choose blank, grid, lined or dotted paper">▦ <span class="word optional" id="paperLabel">Blank</span></button>
+
+</div>
+<div class="floating toolbar compact-tools" aria-label="Drawing tools and actions">
+  <button id="brushBtn" class="sidebar-btn selected" title="Pen, highlighter, glitter, eraser, color, thickness, opacity" aria-label="Open brushes and colors"><span class="mini">🎨</span><span class="tool-name">Ink</span></button>
+  <button id="objectsBtn" class="sidebar-btn" title="Move ink, add words, stickers, photos" aria-label="Open art and move tools"><span class="mini">♡</span><span class="tool-name">Art</span></button>
+  <div class="sidebar-divider" aria-hidden="true"></div>
+  <button id="undoBtn" class="sidebar-btn" title="Undo last change"><span class="mini">↶</span><span class="tool-name">Undo</span></button>
+  <button id="redoBtn" class="sidebar-btn" title="Redo last undone change"><span class="mini">↷</span><span class="tool-name">Redo</span></button>
+  <button id="deleteBtn" class="sidebar-btn" title="Clear the selected handwriting, words, stickers or pictures"><span class="mini">⌦</span><span class="tool-name">Clear selected</span></button>
+  <button id="clearBtn" class="sidebar-btn danger-action" title="Clear the entire board after confirmation"><span class="mini">✕</span><span class="tool-name">Clear all</span></button>
+  <div class="sidebar-divider" aria-hidden="true"></div>
+  <button id="saveMenuBtn" class="sidebar-btn" title="Save PNG, backup, or restore your board"><span class="mini">↓</span><span class="tool-name">Save</span></button>
+  <button id="helpBtn" class="sidebar-btn" title="Instructions and button explanations"><span class="mini">?</span><span class="tool-name">Help</span></button>
+  <button id="hideUiBtn" class="sidebar-btn hide-ui" title="Hide all controls so you can draw without distractions"><span class="mini">⛶</span><span class="tool-name">Hide</span></button>
+</div>
+<button id="showUiBtn" class="show-ui-btn hidden" title="Bring back controls" aria-label="Bring back Tulip Board controls" aria-hidden="true" tabindex="-1">✿</button>
+<aside id="panel" class="floating panel hidden" aria-label="Tool options"><div class="panel-header"><h2 id="panelTitle"></h2><button id="closePanel" title="Close options">✕</button></div><p class="panel-sub" id="panelSub"></p><div class="scroll" id="panelBody"></div></aside>
+<div id="dropzone">Drop a photo to add it ✿</div>
+<div id="toast" class="toast" role="status"></div>
+<div id="modalHost"></div>
+<input id="photoInput" type="file" accept="image/*" class="sr" multiple/>
+<input id="projectInput" type="file" accept="application/json,.json" class="sr"/>
+<script>
+'use strict';
+const W=1600,H=1000,boardCanvas=document.getElementById('board'),ctx=boardCanvas.getContext('2d',{alpha:false});
+const el=id=>document.getElementById(id);
+const FONT_OPTIONS=[
+ {id:'quicksand',name:'Soft & sweet',family:'"Quicksand", "Avenir Next", sans-serif',weight:600},
+ {id:'dancing',name:'Dancing Script',family:'"Dancing Script", cursive',weight:700},
+ {id:'pacifico',name:'Pacifico',family:'"Pacifico", cursive',weight:400},
+ {id:'caveat',name:'Caveat notes',family:'"Caveat", cursive',weight:700},
+ {id:'greatvibes',name:'Great Vibes',family:'"Great Vibes", cursive',weight:400},
+ {id:'playfair',name:'Playfair',family:'"Playfair Display", Georgia, serif',weight:600},
+ {id:'cormorant',name:'Vintage serif',family:'"Cormorant Garamond", Georgia, serif',weight:600},
+ {id:'sacramento',name:'Sacramento',family:'"Sacramento", cursive',weight:400},
+ {id:'comfortaa',name:'Round & cozy',family:'"Comfortaa", sans-serif',weight:600},
+ {id:'indie',name:'Indie Flower',family:'"Indie Flower", cursive',weight:400},
+ {id:'kalam',name:'Kalam',family:'"Kalam", cursive',weight:400},
+ {id:'nunito',name:'Nunito',family:'"Nunito", sans-serif',weight:600},
+ {id:'dmsans',name:'Clean modern',family:'"DM Sans", sans-serif',weight:600},
+ {id:'classic',name:'Classic serif',family:'Georgia, "Times New Roman", serif',weight:600},
+ {id:'rounded',name:'Original rounded',family:'"Avenir Next", ui-rounded, system-ui, sans-serif',weight:600}
+];
+const fontFor=id=>FONT_OPTIONS.find(f=>f.id===id)||FONT_OPTIONS.find(f=>f.id==='rounded');
+const fontCSS=(id,px)=>{const f=fontFor(id);return `${f.weight} ${Math.max(4,px)}px ${f.family}`};
+// Existing text objects default to their original rounded font, so older drawings look unchanged.
+
+const GROUPS={
+  'Classic':['#111111','#ffffff','#ef3448','#ff8a00','#ffdc27','#198e55','#1e70e8','#7543d0','#c438a2','#70462e','#797b82','#20b5be'],
+  'Pastel':['#e3a1c1','#f7b9d4','#f8d9e7','#c9a0ed','#e0c8ff','#b3cdfd','#a5dce4','#b2e7c4','#f6df9a','#f6c8a8','#d6bba6','#b7aabf'],
+  'Bright':['#ff245b','#ff650b','#f7b400','#8dd600','#13be66','#00c8cf','#078aff','#604cff','#bd28e8','#ff32ba','#29e0aa','#ffeb58'],
+  'Deep':['#73213e','#a35077','#d06f96','#4d286e','#7760ac','#193d76','#336987','#144946','#556c4e','#7c652c','#4b4056','#242a30'],
+  'Chalk':['#f6f2e8','#ffd0db','#e5b3fc','#a9d9ff','#bdf5d7','#fff1aa','#ffbd96','#e1d7eb','#99bece','#deb6a1','#bed1a3','#f3a4b5']
+};
+const stickerSvgs={
+ bunny:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160"><ellipse cx="53" cy="48" rx="19" ry="43" fill="#fff9fc" stroke="#b68ba9" stroke-width="4" transform="rotate(-11 53 48)"/><ellipse cx="107" cy="48" rx="19" ry="43" fill="#fff9fc" stroke="#b68ba9" stroke-width="4" transform="rotate(11 107 48)"/><ellipse cx="53" cy="47" rx="8" ry="30" fill="#f8b3ce" transform="rotate(-11 53 47)"/><ellipse cx="107" cy="47" rx="8" ry="30" fill="#f8b3ce" transform="rotate(11 107 47)"/><circle cx="80" cy="99" r="57" fill="#fff9fc" stroke="#b68ba9" stroke-width="4"/><ellipse cx="59" cy="97" rx="5" ry="7" fill="#685169"/><ellipse cx="101" cy="97" rx="5" ry="7" fill="#685169"/><circle cx="46" cy="112" r="10" fill="#ffcfdf" opacity=".85"/><circle cx="114" cy="112" r="10" fill="#ffcfdf" opacity=".85"/><path d="M74 114q6 6 12 0" stroke="#a06f87" fill="none" stroke-width="3" stroke-linecap="round"/><path d="M76 108q4-4 8 0l-4 5z" fill="#e99abb"/><path d="M45 55l-8-10 16 4z M105 52l8-11 4 15z" fill="#e7b0d0"/></svg>`,
+ duck:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160"><ellipse cx="82" cy="99" rx="64" ry="50" fill="#ffe9a0" stroke="#ddbd70" stroke-width="4"/><circle cx="78" cy="61" r="43" fill="#fff0b5" stroke="#ddbd70" stroke-width="4"/><path d="M42 52q-17 0-9-15 10-8 17 4" fill="#ffe89e"/><path d="M116 73q27-4 28 12-18 9-30 1z" fill="#ffbd8b" stroke="#d59c76" stroke-width="3"/><ellipse cx="65" cy="60" rx="5" ry="7" fill="#635063"/><ellipse cx="92" cy="60" rx="5" ry="7" fill="#635063"/><circle cx="53" cy="77" r="10" fill="#ffc1be" opacity=".9"/><circle cx="102" cy="77" r="10" fill="#ffc1be" opacity=".9"/><path d="M76 69q9-5 17 0-8 14-17 0z" fill="#ffb06f" stroke="#db9863" stroke-width="2"/><path d="M30 104q13-23 29-11 6 23-18 33" fill="#ffe4a0" stroke="#ddbd70" stroke-width="3"/></svg>`,
+ tulip:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160"><path d="M80 73v72" stroke="#82ae87" stroke-width="7" stroke-linecap="round"/><path d="M79 117Q43 87 33 109q17 23 44 21" fill="#afd7a6" stroke="#82ae87" stroke-width="3"/><path d="M83 126q35-36 44-23-10 29-42 33" fill="#afd7a6" stroke="#82ae87" stroke-width="3"/><path d="M37 50Q28 17 47 17L79 36 111 17q18 1 12 33c-6 34-30 47-44 48-14-1-35-14-42-48Z" fill="#f7a5c4" stroke="#d178a0" stroke-width="4"/><path d="M50 20Q60 42 79 43q19-1 31-23Q111 66 79 92 49 70 50 20Z" fill="#ffc8dc" stroke="#d987a5" stroke-width="3"/><path d="M75 24l4-15 6 15" fill="#fbd0e4"/></svg>`,
+ heartPink:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160"><defs><linearGradient id="g" x2="1" y2="1"><stop stop-color="#ffd0e3"/><stop offset="1" stop-color="#f394bb"/></linearGradient></defs><path d="M80 145C60 122 13 92 13 55 13 20 59 6 80 39c20-34 67-19 67 16 0 37-47 67-67 90Z" fill="url(#g)" stroke="#cf7fa1" stroke-width="4"/><path d="M40 41q13-21 27-7" stroke="#fff6fb" stroke-width="10" fill="none" stroke-linecap="round"/><path d="M105 39l6-12" stroke="#fff1f8" stroke-width="5" stroke-linecap="round"/></svg>`,
+ heartLav:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160"><defs><linearGradient id="g" x2="1" y2="1"><stop stop-color="#ebe0ff"/><stop offset="1" stop-color="#ab8ce8"/></linearGradient></defs><path d="M80 145C60 122 13 92 13 55 13 20 59 6 80 39c20-34 67-19 67 16 0 37-47 67-67 90Z" fill="url(#g)" stroke="#9a79cc" stroke-width="4"/><path d="M40 41q13-21 27-7" stroke="#fff6ff" stroke-width="10" fill="none" stroke-linecap="round"/><path d="M105 39l6-12" stroke="#fffaff" stroke-width="5" stroke-linecap="round"/></svg>`,
+ bow:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160"><path d="M76 75Q14 11 15 66q-5 56 60 17Q60 125 46 148l-16-15q19-33 27-52" fill="#f4b0d0" stroke="#ce7c9f" stroke-width="4"/><path d="M84 75q60-64 61-9 5 56-60 17 15 42 29 65l16-15q-19-33-27-52" fill="#f8c1da" stroke="#ce7c9f" stroke-width="4"/><path d="M80 66q12 0 14 16 0 14-14 14-13 0-14-14 0-14 14-16Z" fill="#e995ba" stroke="#bd7092" stroke-width="4"/><path d="M30 58q13-5 27 8M130 57q-13-4-27 8" fill="none" stroke="#fff1fa" stroke-width="5" stroke-linecap="round"/></svg>`,
+ cloud:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160"><path d="M39 123Q8 119 12 90q2-25 31-30Q48 24 81 30q27 3 31 33 34-2 35 27 1 30-29 33Z" fill="#fff9ff" stroke="#bca2db" stroke-width="4"/><ellipse cx="63" cy="88" rx="5" ry="7" fill="#a48bb8"/><ellipse cx="100" cy="88" rx="5" ry="7" fill="#a48bb8"/><path d="M74 101q9 11 18 0" stroke="#ad8bb7" stroke-width="3" fill="none" stroke-linecap="round"/><circle cx="50" cy="104" r="10" fill="#ffd0e7"/><circle cx="115" cy="104" r="10" fill="#ffd0e7"/></svg>`,
+ butterfly:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160"><path d="M78 83Q11 4 14 67q0 28 58 35-56 3-39 35 25 32 48-36Q100 169 129 137q17-33-39-35 58-7 58-35 3-63-64 16" fill="#d6c0f8" stroke="#a98ccd" stroke-width="4"/><path d="M80 71v55" stroke="#9672b8" stroke-width="7" stroke-linecap="round"/><path d="M76 75q-9-29-19-24m30 24q10-29 20-24" stroke="#9672b8" fill="none" stroke-width="3" stroke-linecap="round"/><circle cx="46" cy="67" r="13" fill="#f8c3dc"/><circle cx="116" cy="67" r="13" fill="#f8c3dc"/></svg>`,
+ strawberry:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160"><path d="M80 48Q24 9 18 65q0 47 62 82 62-35 62-82-7-56-62-17Z" fill="#f296ae" stroke="#c9748c" stroke-width="4"/><path d="M80 40Q58 13 49 14q-3 22 19 33-32-13-44-1 14 17 41 12 21 8 31-1 27 4 41-11-24-14-43 2 22-11 19-34Q98 16 80 40Z" fill="#a3cba4" stroke="#7eab83" stroke-width="3"/><g fill="#fff5d9"><ellipse cx="53" cy="78" rx="3" ry="5"/><ellipse cx="84" cy="73" rx="3" ry="5"/><ellipse cx="111" cy="83" rx="3" ry="5"/><ellipse cx="65" cy="107" rx="3" ry="5"/><ellipse cx="97" cy="107" rx="3" ry="5"/></g></svg>`,
+ sparkle:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160"><path d="M79 10q10 61 60 70-50 11-60 70-10-59-60-70 50-9 60-70Z" fill="#ffe3a0" stroke="#d9b878" stroke-width="4"/><path d="M27 17q4 17 19 21-15 3-19 20-4-17-20-20 16-4 20-21Z" fill="#f4bedf"/><path d="M134 100q4 17 19 21-15 3-19 20-4-17-20-20 16-4 20-21Z" fill="#d2c0f8"/></svg>`,
+ kitty:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160"><path d="M25 65 26 19l39 28q15-6 30 0l39-28 1 47q20 29 6 52-15 29-61 29-45 0-60-29-15-24 5-53Z" fill="#fffaf9" stroke="#b29fb2" stroke-width="4"/><path d="M33 38v28l25-11z M126 38v28l-25-11z" fill="#f4c5d8"/><circle cx="60" cy="90" r="6" fill="#5c5364"/><circle cx="103" cy="90" r="6" fill="#5c5364"/><path d="M75 104q5-5 10 0l-5 5z" fill="#e8a4b9"/><path d="M80 109q-9 12-15 4m15-4q9 12 15 4" stroke="#806c81" stroke-width="3" fill="none"/><circle cx="45" cy="106" r="10" fill="#fbd7df"/><circle cx="115" cy="106" r="10" fill="#fbd7df"/><path d="M37 111H14M37 118l-19 7M124 111h23M124 118l19 7" stroke="#b6a5b7" stroke-width="2.5" stroke-linecap="round"/></svg>`,
+ rose:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160"><path d="M80 83v64" stroke="#8db68f" stroke-width="7" stroke-linecap="round"/><path d="M78 116q-28-29-42-12 15 21 42 19M83 124q28-29 42-12-15 21-42 19" fill="#badcba" stroke="#8db68f" stroke-width="3"/><circle cx="80" cy="61" r="42" fill="#f6b1cb" stroke="#d98ba9" stroke-width="4"/><path d="M46 74q31 15 42-1 19-28-7-37-24-8-34 17 12-13 25-6 12 9 2 18-14 6-17-7" fill="none" stroke="#d780a5" stroke-width="7" stroke-linecap="round"/><path d="M56 29q27-31 50 0" stroke="#ffdbeb" stroke-width="8" fill="none" stroke-linecap="round"/></svg>`
+};
+const stickerNames={bunny:'Sleepy bunny',duck:'Baby duckling',tulip:'Pink tulip',heartPink:'Pink heart',heartLav:'Purple heart',bow:'Ribbon bow',cloud:'Happy cloud',butterfly:'Lavender butterfly',strawberry:'Strawberry',sparkle:'Sparkles',kitty:'Little kitten',rose:'Blush rose'};
+const openmoji=[['openRabbit','Rabbit · OpenMoji','1F430','bunny'],['openDuck','Duck · OpenMoji','1F986','duck'],['openTulip','Tulip · OpenMoji','1F337','tulip'],['openPink','Pink heart · OpenMoji','1FA77','heartPink'],['openPurple','Purple heart · OpenMoji','1F49C','heartLav']];
+const ONLINE_URL='https://cdn.jsdelivr.net/npm/openmoji@17.0.0/color/svg/';
+const stickerData=Object.fromEntries(Object.entries(stickerSvgs).map(([id,s])=>[id,'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(s)]));
+for(const [id,name,code,fallback] of openmoji) stickerData[id]=ONLINE_URL+code+'.svg';
+const stickerCache=new Map();
+function loadSticker(id){if(stickerCache.has(id))return stickerCache.get(id);const p=new Promise(resolve=>{const im=new Image();if(id.startsWith('open'))im.crossOrigin='anonymous';im.onload=()=>resolve(im);im.onerror=()=>id.startsWith('open')?loadSticker(openmoji.find(a=>a[0]===id)[3]).then(resolve):resolve(null);im.src=stickerData[id]||stickerData.bunny});stickerCache.set(id,p);p.then(()=>render());return p;}
+const newBoard=(type)=>({paper:'blank',items:[],title:type==='white'?'Whiteboard':'Chalkboard'});
+let docs={white:newBoard('white'),chalk:newBoard('chalk')},active='white',tool='pen',color='#b586cc',size=5,opacity=1,selectedId=null,selectedIds=[],selectionRect=null,stamp='bunny',history={white:[],chalk:[]},future={white:[],chalk:[]},drag=null,panel='',glitterDensity=5, pencilOnly=false, readonlyFocus=false;
+const current=()=>docs[active];
+let redrawPending=false,offscreen=document.createElement('canvas');offscreen.width=W;offscreen.height=H;const ink=offscreen.getContext('2d');
+let stageRatio=1;
+function resized(){const rect=boardCanvas.getBoundingClientRect();const scale=Math.min(2,window.devicePixelRatio||1);boardCanvas.width=Math.max(1,Math.round(rect.width*scale));boardCanvas.height=Math.max(1,Math.round(rect.height*scale));stageRatio=scale;render()}
+window.addEventListener('resize',resized);
+const pos=e=>{const r=boardCanvas.getBoundingClientRect();return {x:(e.clientX-r.left)/r.width*W,y:(e.clientY-r.top)/r.height*H}};
+const distance=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
+const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
+function kindBg(c,doc,type){c.save();c.fillStyle=type==='white'?'#fffdfa':'#203037';c.fillRect(0,0,W,H);
+ const line=type==='white'?'rgba(147,140,167,.18)':'rgba(205,229,229,.11)';c.strokeStyle=line;c.lineWidth=1.7;
+ if(doc.paper==='grid'){for(let x=0;x<=W;x+=50){c.beginPath();c.moveTo(x,0);c.lineTo(x,H);c.stroke()}for(let y=0;y<=H;y+=50){c.beginPath();c.moveTo(0,y);c.lineTo(W,y);c.stroke()}}
+ if(doc.paper==='lined'){for(let y=90;y<=H;y+=58){c.beginPath();c.moveTo(0,y);c.lineTo(W,y);c.stroke()}c.strokeStyle=type==='white'?'rgba(235,160,178,.22)':'rgba(215,160,190,.12)';c.beginPath();c.moveTo(140,0);c.lineTo(140,H);c.stroke()}
+ if(doc.paper==='dot'){c.fillStyle=line;for(let x=30;x<W;x+=48)for(let y=24;y<H;y+=48){c.beginPath();c.arc(x,y,2.2,0,Math.PI*2);c.fill()}}
+ c.restore()}
+function hashRand(n){let x=Math.sin(n*127.1+78.233)*43758.5453;return x-Math.floor(x)}
+function strokePath(c,s){let pts=s.points;if(!pts.length)return;c.save();if(s.tool==='eraser'){c.globalCompositeOperation='destination-out';c.strokeStyle='#000';c.globalAlpha=1;c.lineWidth=s.size;c.lineCap='round';c.lineJoin='round'}else{c.globalCompositeOperation='source-over';c.strokeStyle=s.color;c.globalAlpha=s.tool==='highlighter'?s.opacity*0.29:s.tool==='chalk'?s.opacity*.7:s.opacity;c.lineWidth=s.size;c.lineCap='round';c.lineJoin='round'}
+if(s.tool==='glitter'){c.globalAlpha=s.opacity*.12;c.lineWidth=Math.max(1.0,s.size*.40)}
+if(s.tool==='chalk'){c.shadowColor=s.color;c.shadowBlur=s.size*.16}
+c.beginPath();c.moveTo(pts[0].x,pts[0].y);for(let i=1;i<pts.length;i++){let p=pts[i];c.lineTo(p.x,p.y)}if(pts.length===1)c.lineTo(pts[0].x+.1,pts[0].y+.1);c.stroke();c.shadowBlur=0;
+if(s.tool==='glitter'){
+  // Delicate hand-drawn sparkle dust. Intentionally no emoji or luminous blur.
+  // Spacing is measured along the path, so Pencil sampling frequency doesn't change the look.
+  const seed=Array.from(s.id||'').reduce((sum,ch)=>sum+ch.charCodeAt(0),0);
+  const interval=Math.max(6,Math.min(11,5+s.size*.13));
+  let journey=0,index=0,drawn=0;
+  c.shadowBlur=0;
+  for(let k=1;k<pts.length && drawn<1600;k++){
+    const prev=pts[k-1],next=pts[k],length=Math.hypot(next.x-prev.x,next.y-prev.y);
+    if(length<.01)continue;
+    while(journey<=length && drawn<1600){
+      const t=journey/length,r=hashRand(index*7+seed),r2=hashRand(index*11+seed+67);
+      const x=prev.x+(next.x-prev.x)*t+(r-.5)*s.size*2.2;
+      const y=prev.y+(next.y-prev.y)*t+(r2-.5)*s.size*2.2;
+      const radius=.72+hashRand(index*17+seed)*.63;
+      c.fillStyle=(index%4===0?'#f5e9eb':s.color);
+      c.globalAlpha=s.opacity*(index%4===0?.46:.62);
+      c.beginPath();c.arc(x,y,radius,0,Math.PI*2);c.fill();
+      // A few miniature four-point specks, not harsh filled star shapes.
+      if(index%9===0){
+        const arm=2.4+hashRand(index*19+seed)*1.3;
+        c.strokeStyle=index%2===0?'#f0d5e8':s.color;
+        c.lineWidth=.7;c.globalAlpha=s.opacity*.55;c.beginPath();
+        c.moveTo(x-arm,y);c.lineTo(x+arm,y);c.moveTo(x,y-arm);c.lineTo(x,y+arm);c.stroke();
+      }
+      index++;drawn++;journey+=interval;
+    }
+    journey-=length;
+  }
+  if(pts.length===1){
+    c.globalAlpha=s.opacity*.35;c.fillStyle=s.color;
+    c.beginPath();c.arc(pts[0].x,pts[0].y,.95,0,Math.PI*2);c.fill();
+  }
+}
+if(s.tool==='chalk'){c.globalAlpha=.2;for(let i=0;i<pts.length;i+=3){const p=pts[i],r=hashRand(i+17);c.fillStyle=s.color;c.fillRect(p.x+(r-.5)*s.size,p.y+(hashRand(i+73)-.5)*s.size,1.5,1.5)}}c.restore()}
+function getObject(id){return current().items.find(o=>o.id===id && (o.type==='sticker'||o.type==='image'||o.type==='text'))}
+function itemBounds(o){
+ if(o.type==='sticker'||o.type==='image'||o.type==='text')return {x:o.x,y:o.y,w:o.w,h:o.h};
+ if(o.type==='stroke' && o.points?.length){
+  let minX=Infinity,minY=Infinity,maxX=-Infinity,maxY=-Infinity;
+  for(const pt of o.points){minX=Math.min(minX,pt.x);minY=Math.min(minY,pt.y);maxX=Math.max(maxX,pt.x);maxY=Math.max(maxY,pt.y)}
+  const pad=Math.min(o.size||4,18)*.24;
+  return {x:minX-pad,y:minY-pad,w:Math.max(2,maxX-minX+pad*2),h:Math.max(2,maxY-minY+pad*2)};
+ }
+ return null;
+}
+function mergedBounds(ids){
+ const bounds=current().items.filter(o=>ids.includes(o.id)).map(itemBounds).filter(Boolean);
+ if(!bounds.length)return null;
+ const x=Math.min(...bounds.map(b=>b.x)),y=Math.min(...bounds.map(b=>b.y));
+ const r=Math.max(...bounds.map(b=>b.x+b.w)),b=Math.max(...bounds.map(b=>b.y+b.h));
+ return {x,y,w:r-x,h:b-y};
+}
+function insideBounds(pt,b,pad=0){return !!b && pt.x>=b.x-pad && pt.x<=b.x+b.w+pad && pt.y>=b.y-pad && pt.y<=b.y+b.h+pad}
+function segmentDistance(p,a,b){const dx=b.x-a.x,dy=b.y-a.y, d=dx*dx+dy*dy;const t=d?clamp(((p.x-a.x)*dx+(p.y-a.y)*dy)/d,0,1):0;return Math.hypot(p.x-(a.x+t*dx),p.y-(a.y+t*dy))}
+function hitStroke(pt){
+ for(let i=current().items.length-1;i>=0;i--){
+  const s=current().items[i];if(s.type!=='stroke'||!s.points?.length)continue;
+  const bounds=itemBounds(s);if(!insideBounds(pt,bounds,15))continue;
+  const tolerance=Math.max(9,Math.min(26,(s.size||4)*.35+8));
+  if(s.points.length===1 && distance(pt,s.points[0])<tolerance)return s;
+  for(let j=1;j<s.points.length;j++)if(segmentDistance(pt,s.points[j-1],s.points[j])<tolerance)return s;
+ }
+ return null;
+}
+function moveSelectedFrom(source,dx,dy){
+ for(const id of selectedIds){
+  const item=current().items.find(o=>o.id===id),original=source.get(id);
+  if(!item||!original)continue;
+  if(item.type==='stroke')item.points=original.points.map(p=>({x:p.x+dx,y:p.y+dy}));
+  else {item.x=original.x+dx;item.y=original.y+dy;}
+ }
+}
+function rectangleSelection(rect){
+ const x=Math.min(rect.x,rect.x+rect.w),y=Math.min(rect.y,rect.y+rect.h);
+ const box={x,y,w:Math.abs(rect.w),h:Math.abs(rect.h)};
+ if(box.w<10&&box.h<10)return [];
+ return current().items.filter(item=>{
+  const b=itemBounds(item);if(!b)return false;
+  const overlapW=Math.max(0,Math.min(box.x+box.w,b.x+b.w)-Math.max(box.x,b.x));
+  const overlapH=Math.max(0,Math.min(box.y+box.h,b.y+b.h)-Math.max(box.y,b.y));
+  const ratio=overlapW*overlapH/Math.max(1,b.w*b.h);
+  // A deliberate enclosure or most of an item inside the marquee picks the entire item.
+  return ratio>.63 || (b.x>=box.x-5&&b.y>=box.y-5&&b.x+b.w<=box.x+box.w+5&&b.y+b.h<=box.y+box.h+5);
+ }).map(item=>item.id);
+}
+function clearSelection(){selectedId=null;selectedIds=[];selectionRect=null}
+
+function drawPhoto(c,o){const im=photoCache.get(o.id);if(im?.complete && im.naturalWidth){c.drawImage(im,o.x,o.y,o.w,o.h)}else if(!im){const n=new Image();n.onload=()=>render();n.src=o.src;photoCache.set(o.id,n)}}
+const photoCache=new Map();
+function textLines(text){
+ const lines=[];
+ for(const paragraph of String(text).split('\n')){
+  if(!paragraph){lines.push('');continue}
+  let line='';
+  for(const word of paragraph.split(/\s+/)){
+   const next=line?line+' '+word:word;
+   if(next.length>38 && line){lines.push(line);line=word}else line=next;
+  }
+  lines.push(line);
+ }
+ return lines;
+}
+function measuredTextSize(text,fontSize,fontId){
+ const c=offscreen.getContext('2d');
+ c.save();c.font=fontCSS(fontId,fontSize);
+ const width=Math.min(1450,Math.max(75,...textLines(text).map(line=>c.measureText(line||' ').width+24)));
+ c.restore();
+ const height=Math.max(38,textLines(text).length*fontSize*1.28+14);
+ return {w:width,h:height};
+}
+function drawText(c,o){
+ c.save();c.fillStyle=o.color||'#6f4d81';
+ const fontSize=o.fontSize||43;
+ c.font=fontCSS(o.fontId||'rounded',fontSize);
+ c.textBaseline='top';
+ for(const [i,line] of textLines(o.text).entries())c.fillText(line,o.x,o.y+i*fontSize*1.28);
+ c.restore();
+}
+function editTypedText(existing){
+ const editing=!!existing;
+ const initialColor=existing?.color||(active==='white'?'#765c86':'#f2dff5');
+ const initialSize=Math.round(existing?.fontSize||43);
+ const initialFont=fontFor(existing?.fontId||'dancing').id;
+ const host=el('modalHost');
+ host.innerHTML=`<div class="modalback words-modalback" id="wordsModalBackdrop"><form id="wordsForm" novalidate class="modal" role="dialog" aria-modal="true" aria-labelledby="wordsTitle">
+   <h2 id="wordsTitle">${editing?'Edit your words':'Pretty words & titles'}</h2>
+   <p>Type a title or note, then resize it directly on the board with the purple corner handle.</p>
+   <label class="text-label" for="wordsInput">Your words</label>
+   <textarea id="wordsInput" maxlength="480" placeholder="A cute title, reminder, or class notes…" required></textarea>
+   <div class="text-options">
+      <label>Ink color<input type="color" id="wordsColor" value="${initialColor}"></label>
+      <label>Starting size <span id="wordsSizeLabel">${initialSize} px</span><input type="range" id="wordsSize" min="16" max="100" value="${Math.max(16,Math.min(100,initialSize))}"></label>
+   </div>
+   <label class="text-label">Choose a font</label>
+   <div id="fontGallery" class="font-gallery" role="group" aria-label="Choose a font">
+    ${FONT_OPTIONS.map(f=>`<button type="button" class="font-choice ${f.id===initialFont?'active':''}" data-font="${f.id}" aria-pressed="${f.id===initialFont}"><span class="font-sample" style="font-family:${f.family};font-weight:${f.weight}">Aa Tulip</span><span class="font-name">${f.name}</span></button>`).join('')}
+   </div>
+   <div id="wordsPreview" class="words-preview" aria-label="Text preview"></div>
+   <p class="words-help">After adding: Art → Box select & move. Drag the purple corner dot to resize your words.</p>
+   <div class="modal-actions"><button type="button" id="wordsCancel">Cancel</button><button type="button" class="primary" id="wordsConfirm">${editing?'Save changes':'Add to board'}</button></div>
+ </form></div>`;
+ const editor=el('wordsInput');editor.value=existing?.text||'';
+ let chosenFont=initialFont;
+ const redrawPreview=()=>{
+  const p=el('wordsPreview');if(!p)return;
+  p.style.font=fontCSS(chosenFont,Math.max(18,Math.min(32,Number(el('wordsSize').value)*.58)));
+  p.style.color=el('wordsColor').value;
+  p.textContent=editor.value||'Your pretty words will look like this ✿';
+ };
+ el('wordsSize').oninput=e=>{el('wordsSizeLabel').textContent=e.target.value+' px';redrawPreview()};
+ el('wordsColor').oninput=redrawPreview;
+ editor.oninput=redrawPreview;
+ el('fontGallery').addEventListener('click',e=>{
+  const b=e.target.closest('[data-font]');if(!b)return;
+  chosenFont=b.dataset.font;
+  el('fontGallery').querySelectorAll('[data-font]').forEach(x=>{x.classList.toggle('active',x===b);x.setAttribute('aria-pressed',x===b?'true':'false')});
+  redrawPreview();
+ });
+ const close=()=>{host.innerHTML=''};
+ el('wordsCancel').onclick=close;
+ el('wordsModalBackdrop').addEventListener('click',e=>{if(e.target.id==='wordsModalBackdrop')close()});
+ el('wordsForm').addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();e.stopPropagation();close()}});
+ let committed=false;
+ const commitWords=()=>{
+  if(committed)return;
+  const content=editor.value.trim().slice(0,480);
+  if(!content){editor.focus();toast('Type your words first, then tap Add to board');return}
+  committed=true;
+  let fontSize=Number(el('wordsSize').value);
+  const textColor=el('wordsColor').value;
+  // Make sure even long notes start with a reachable resize handle on-screen.
+  let dims=measuredTextSize(content,fontSize,chosenFont);
+  while(fontSize>13 && (dims.w>W-170 || dims.h>H-170)){
+   fontSize=Math.max(13,fontSize-2);
+   dims=measuredTextSize(content,fontSize,chosenFont);
+  }
+  snapshot();
+  let item=existing;
+  if(item){
+   Object.assign(item,{text:content,w:dims.w,h:dims.h,color:textColor,fontSize,fontId:chosenFont});
+   item.x=clamp(item.x,10,Math.max(10,W-dims.w-12));
+   item.y=clamp(item.y,55,Math.max(55,H-dims.h-12));
+  }else{
+   item={id:newId(),type:'text',text:content,color:textColor,fontSize,fontId:chosenFont,
+    x:Math.max(12,(W-dims.w)/2),y:Math.max(55,(H-dims.h)/2),w:dims.w,h:dims.h};
+   current().items.push(item);
+  }
+  selectedId=item.id;selectedIds=[item.id];tool='select';
+  editor.blur();close();hidePanel();render();scheduleSave();
+  toast(editing?'Words updated · drag corner to resize':'Words added! Drag the purple corner to resize.');
+  if(document.fonts?.load){document.fonts.load(fontCSS(chosenFont,fontSize)).then(()=>render()).catch(()=>{});}
+ };
+ el('wordsConfirm').addEventListener('click',e=>{e.preventDefault();commitWords()});
+ el('wordsForm').addEventListener('submit',e=>{e.preventDefault();commitWords()});
+ redrawPreview();
+ // Keep the entire board visible until the user taps the text field.
+}
+
+function drawSticker(c,o){let cached=stickerRenderCache.get(o.sticker);if(cached){c.drawImage(cached,o.x,o.y,o.w,o.h)}else{loadSticker(o.sticker).then(im=>{if(im){stickerRenderCache.set(o.sticker,im);render()}})}}
+const stickerRenderCache=new Map();
+function renderTo(c,type,opts={}){const doc=docs[type];c.save();c.setTransform(1,0,0,1,0,0);let cw=c.canvas.width,ch=c.canvas.height;c.scale(cw/W,ch/H);kindBg(c,doc,type);
+ink.clearRect(0,0,W,H);
+for(const item of doc.items){if(item.type==='stroke')strokePath(ink,item)}
+c.drawImage(offscreen,0,0);
+for(const item of doc.items){if(item.type==='sticker')drawSticker(c,item);else if(item.type==='image')drawPhoto(c,item);else if(item.type==='text')drawText(c,item)}
+if(opts.selection){
+  const bounds=mergedBounds(selectedIds);
+  if(bounds){
+   c.save();c.setLineDash([10,7]);c.lineWidth=2.5;
+   c.strokeStyle=type==='white'?'#9468bb':'#e5c1ff';c.fillStyle=type==='white'?'rgba(178,130,229,.08)':'rgba(219,184,250,.10)';
+   c.fillRect(bounds.x-7,bounds.y-7,bounds.w+14,bounds.h+14);
+   c.strokeRect(bounds.x-7,bounds.y-7,bounds.w+14,bounds.h+14);c.setLineDash([]);
+   // The purple corner handle resizes photos, stickers, and typed text.
+   if(selectedIds.length===1){const obj=getObject(selectedIds[0]);if(obj && (obj.type==='sticker'||obj.type==='image'||obj.type==='text')){c.fillStyle='#e9c2f8';c.strokeStyle='#fff';c.lineWidth=4;c.beginPath();c.arc(obj.x+obj.w,obj.y+obj.h,13,0,Math.PI*2);c.fill();c.stroke()}}
+   c.restore();
+  }
+  if(selectionRect){
+   c.save();c.strokeStyle=type==='white'?'#9565c1':'#e5c1ff';c.lineWidth=2.7;c.setLineDash([9,6]);c.fillStyle='rgba(198,168,238,.15)';
+   c.fillRect(selectionRect.x,selectionRect.y,selectionRect.w,selectionRect.h);
+   c.strokeRect(selectionRect.x,selectionRect.y,selectionRect.w,selectionRect.h);c.restore();
+  }
+ }
+c.restore()}
+function render(){if(redrawPending)return;redrawPending=true;requestAnimationFrame(()=>{redrawPending=false;renderTo(ctx,active,{selection:true});updateButtons()})}
+function updateButtons(){
+ document.querySelectorAll('[data-board]').forEach(b=>b.classList.toggle('selected',b.dataset.board===active));
+ el('paperLabel').textContent=({blank:'Blank',grid:'Grid',lined:'Lined',dot:'Dots'})[current().paper];
+ const ub=el('undoBtn');if(ub)ub.disabled=history[active].length===0;
+ const rb=el('redoBtn');if(rb)rb.disabled=future[active].length===0;
+ const db=el('deleteBtn');if(db)db.disabled=!selectedIds.length;
+ el('brushBtn').classList.toggle('selected',panel==='colors');
+ el('objectsBtn').classList.toggle('selected',panel==='stickers');
+ 
+ el('saveMenuBtn').classList.toggle('selected',panel==='save');
+ el('helpBtn').classList.toggle('selected',panel==='help');
+ const editWords=el('editTypedText');if(editWords)editWords.disabled=!(selectedIds.length===1&&getObject(selectedIds[0])?.type==='text');
+ el('surface').classList.toggle('mode-move',tool==='select');
+}
+let saveTimer;
+function scheduleSave(){clearTimeout(saveTimer);saveTimer=setTimeout(persist,350)}
+function snapshot(){history[active].push(JSON.stringify(current()));if(history[active].length>60)history[active].shift();future[active]=[]}
+function restoreHistory(direction){const from=direction==='undo'?history:future,to=direction==='undo'?future:history;if(!from[active].length)return;to[active].push(JSON.stringify(current()));docs[active]=JSON.parse(from[active].pop());clearSelection();render();scheduleSave();}
+function newId(){return 'o'+Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
+function selectTool(t){tool=t;clearSelection();render();if(t==='sticker'||t==='select'){if(panel!=='stickers'){panel='stickers';el('panel').classList.remove('hidden')}drawPanel('stickers')}else if(['pen','highlighter','glitter','eraser'].includes(t)){if(panel!=='colors'){panel='colors';el('panel').classList.remove('hidden')}drawPanel('colors')}}
+function setActive(type){active=type;clearSelection();hidePanel();render();scheduleSave();}
+function applyStroke(e){if(pencilOnly && e.pointerType!=='pen'){toast('Pencil-only is on. Turn it off in the brush panel to use touch.');return}snapshot();const s={id:newId(),type:'stroke',tool:tool==='eraser'?'eraser':(tool==='pen' && active==='chalk'?'chalk':tool),color,size:size*(W/Math.max(900,window.innerWidth))*.85,opacity,points:[pos(e)]};if(tool==='highlighter')s.size=Math.max(18,s.size*4);else if(tool==='eraser')s.size=Math.max(18,s.size*3);else if(tool==='glitter')s.size=Math.max(5,s.size*1.5);current().items.push(s);drag={kind:'draw',id:s.id};render()}
+function addStamp(pt){const o={id:newId(),type:'sticker',sticker:stamp,x:clamp(pt.x-68,0,W-140),y:clamp(pt.y-68,0,H-140),w:136,h:136};current().items.push(o)}
+function hitObject(pt){return [...current().items].reverse().find(o=>(o.type==='image'||o.type==='sticker'||o.type==='text')&&pt.x>=o.x&&pt.x<=o.x+o.w&&pt.y>=o.y&&pt.y<=o.y+o.h)}
+function startPointer(e){
+ if(e.button && e.button!==0)return;
+ if(e.target!==boardCanvas)return;
+ e.preventDefault();boardCanvas.setPointerCapture(e.pointerId);
+ const pt=pos(e);
+ if(['pen','highlighter','glitter','eraser'].includes(tool)){applyStroke(e);return}
+ if(tool==='sticker'){snapshot();addStamp(pt);drag={kind:'stamp',last:pt};render();scheduleSave();return}
+ if(tool!=='select')return;
+ const bounds=mergedBounds(selectedIds);
+ // Resize a selected photo, sticker, or typed text by dragging the purple handle.
+ if(selectedIds.length===1){
+  const obj=getObject(selectedIds[0]);
+  if(obj && (obj.type==='image'||obj.type==='sticker'||obj.type==='text') && distance(pt,{x:obj.x+obj.w,y:obj.y+obj.h})<44){
+   snapshot();drag={kind:'resize',id:obj.id,start:pt,from:{...obj}};return;
+  }
+ }
+ // Dragging anywhere inside the active selection moves the grouped content.
+ if(insideBounds(pt,bounds,8) && selectedIds.length){
+  const originals=new Map(current().items.filter(o=>selectedIds.includes(o.id)).map(o=>[o.id,JSON.parse(JSON.stringify(o))]));
+  snapshot();drag={kind:'move-selection',start:pt,originals};return;
+ }
+ // Tap directly on an image/sticker or an ink stroke to select and drag it.
+ const obj=hitObject(pt)||hitStroke(pt);
+ if(obj){
+  selectedIds=[obj.id];selectedId=obj.type==='stroke'?null:obj.id;
+  const originals=new Map([[obj.id,JSON.parse(JSON.stringify(obj))]]);
+  snapshot();drag={kind:'move-selection',start:pt,originals};render();return;
+ }
+ // On empty canvas, draw a rectangle to select entire handwritten words or mixed media.
+ clearSelection();selectionRect={x:pt.x,y:pt.y,w:0,h:0};drag={kind:'marquee',start:pt};render();
+}
+function movePointer(e){
+ if(!drag)return;
+ e.preventDefault();const pt=pos(e);
+ if(drag.kind==='draw'){
+  const s=current().items.find(x=>x.id===drag.id);if(!s)return;
+  const events=e.getCoalescedEvents?.()||[e];
+  for(const evt of events){const np=pos(evt);if(distance(np,s.points[s.points.length-1])>.6)s.points.push(np)}
+  render();return;
+ }
+ if(drag.kind==='stamp'){
+  if(distance(pt,drag.last)>115){addStamp(pt);drag.last=pt;render()}
+  return;
+ }
+ if(drag.kind==='marquee'){
+  selectionRect={x:drag.start.x,y:drag.start.y,w:pt.x-drag.start.x,h:pt.y-drag.start.y};render();return;
+ }
+ if(drag.kind==='move-selection'){
+  let dx=pt.x-drag.start.x,dy=pt.y-drag.start.y;
+  const b=mergedBounds(selectedIds);
+  if(b){dx=clamp(dx,-W,W);dy=clamp(dy,-H,H)}
+  moveSelectedFrom(drag.originals,dx,dy);render();return;
+ }
+ const o=getObject(drag.id);if(!o)return;
+ if(drag.kind==='resize'){
+  const ratio=Math.max(.05,drag.from.w/Math.max(1,drag.from.h));
+  const dw=pt.x-drag.start.x,dh=pt.y-drag.start.y;
+  const span=Math.abs(dw)>Math.abs(dh*ratio)?dw:dh*ratio;
+  if(o.type==='text'){
+   const originalSize=drag.from.fontSize||43;
+   const minW=Math.max(35,drag.from.w*12/originalSize);
+   const visibleMaxW=Math.max(minW,Math.min(W-o.x-14,(H-o.y-14)*ratio));
+   const maxW=Math.max(minW,Math.min(1450,drag.from.w*250/originalSize,visibleMaxW));
+   o.w=clamp(drag.from.w+span,minW,maxW);
+   o.h=o.w/ratio;
+   o.fontSize=originalSize*(o.w/Math.max(1,drag.from.w));
+  }else{
+   o.w=clamp(drag.from.w+span,45,1200);o.h=o.w/ratio;
+  }
+ }
+ render();
+}
+function endPointer(e){
+ if(!drag)return;
+ if(drag.kind==='marquee'){
+  selectedIds=rectangleSelection(selectionRect||{x:0,y:0,w:0,h:0});
+  selectedId=selectedIds.length===1&&getObject(selectedIds[0])?selectedIds[0]:null;
+  selectionRect=null;
+  if(selectedIds.length)toast(`${selectedIds.length} item${selectedIds.length===1?'':'s'} selected · drag the box to move`);
+ }
+ drag=null;render();scheduleSave();
+}
+boardCanvas.addEventListener('pointerdown',startPointer);boardCanvas.addEventListener('pointermove',movePointer);boardCanvas.addEventListener('pointerup',endPointer);boardCanvas.addEventListener('pointercancel',endPointer);
+function deleteSelected(){if(!selectedIds.length)return;snapshot();const ids=new Set(selectedIds);current().items=current().items.filter(o=>!ids.has(o.id));for(const id of ids)photoCache.delete(id);clearSelection();render();scheduleSave()}
+function toast(message){const t=el('toast');t.textContent=message;t.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('show'),2600)}
+function confirmModal(title,description,action){el('modalHost').innerHTML=`<div class="modalback" id="modalBack"><div class="modal" role="dialog" aria-modal="true"><h2>${title}</h2><p>${description}</p><div class="modal-actions"><button id="modalCancel">Cancel</button><button class="danger" id="modalConfirm">Clear board</button></div></div></div>`;el('modalCancel').onclick=()=>el('modalHost').innerHTML='';el('modalConfirm').onclick=()=>{el('modalHost').innerHTML='';action()};}
+function clearBoard(){confirmModal('Clear this '+(active==='white'?'whiteboard':'chalkboard')+'?', 'Everything on this board will be removed. You can use Undo afterward.',()=>{snapshot();current().items=[];clearSelection();render();scheduleSave();toast('Board cleared. Undo is still available.')})}
+function hidePanel(){panel='';el('panel').classList.add('hidden');updateButtons()}
+function showPanel(which){if(panel===which){hidePanel();return}panel=which;el('panel').classList.remove('hidden');drawPanel(which);updateButtons()}
+function swatchColor(c){color=c;drawPanel('colors');render()}
+function drawPanel(which){el('panelTitle').textContent={colors:'Brush & color studio',paper:'Paper styles',stickers:'Stickers & photos',save:'Save & restore',help:'Little guide'}[which]||'Tools';el('panelSub').textContent={colors:'Everything for your pen is together: type, thickness, opacity, and color.',paper:'Choose a paper style for this board. Your drawings stay in place.',stickers:'Box-select handwriting, typed words, stickers and photos together.',save:'Download a PNG or save and restore editable backups.',help:'Everything stays on this device until you export or clear it.'}[which]||'';
+let html='';if(which==='colors'){
+html=`<div class="section-label">Choose a brush</div><div class="brush-kind">
+<button id="inkPen" class="${tool==='pen'?'selected':''}">✎ Pen</button>
+<button id="inkHighlight" class="${tool==='highlighter'?'selected':''}">▰ Highlighter</button>
+<button id="inkGlitter" class="${tool==='glitter'?'selected':''}">✧ Soft glitter</button>
+<button id="inkEraser" class="${tool==='eraser'?'selected':''}">⌫ Eraser</button>
+</div>
+<p class="brush-subhead">Soft glitter uses tiny drawn flecks and miniature starbursts — no emoji shine or blurred glow.</p>
+<div class="section-label">Brush controls</div>
+<div class="slider-group"><div class="slider-row"><b>Thickness</b><span id="sizeVal">${size}</span></div><input type="range" id="brushSize" min="1" max="35" value="${size}" aria-label="Brush thickness"></div>
+<div class="slider-group"><div class="slider-row"><b>Opacity</b><span id="opacityVal">${Math.round(opacity*100)}%</span></div><input type="range" id="brushOpacity" min="10" max="100" step="5" value="${Math.round(opacity*100)}" aria-label="Brush opacity"></div>
+<label class="icon-row" style="margin-top:12px"><input id="pencilOnly" type="checkbox" ${pencilOnly?'checked':''} style="width:19px;height:19px;accent-color:#a888c4"><div><b>Apple Pencil only</b><p>Ignore finger touches while drawing</p></div></label>
+<div class="soft-divider"></div>
+<div class="section-label">Custom ink color</div><div class="icon-row"><input type="color" id="customColor" value="${color}" style="width:60px;height:41px;padding:4px;border:0;background:transparent" aria-label="Custom pen color"><p>Pick any shade you like.</p></div>`;
+for(const [group,arr] of Object.entries(GROUPS))html+=`<div class="section-label palette-panel-heading">${group} · ${arr.length} shades</div><div class="colors">${arr.map(c=>`<button class="color-swatch ${color===c?'selected':''} ${['#ffffff','#f8d9e7','#fff1aa','#f6f2e8'].includes(c)?'pale':''}" style="background:${c}" data-color="${c}" title="${c}" aria-label="Ink color ${c}"></button>`).join('')}</div>`;
+}else if(which==='paper'){
+html=`<div class="chiprow">${[['blank','◻ Blank'],['grid','▦ Grid'],['lined','☷ Lined'],['dot','⠿ Dotted']].map(([id,label])=>`<button class="${current().paper===id?'selected':''}" data-paper="${id}">${label}</button>`).join('')}</div><p class="subtle" style="margin-top:20px">Whiteboard uses warm ivory paper. Chalkboard uses soft charcoal slate. Switching boards keeps each board's notes separate.</p>`;
+ }else if(which==='stickers'){
+html=`<div class="section-label">Photos & movable objects</div><div class="brush-kind"><button id="objectSelect" class="${tool==='select'?'selected':''}">▧ Box select & move</button><button id="choosePhoto">▧ Add photo</button><button id="addTypedText">T Add words</button><button id="editTypedText" ${selectedIds.length===1&&getObject(selectedIds[0])?.type==='text'?'':'disabled'} title="Select a typed text object first">✎ Edit selected</button></div><p class="subtle">Draw a box around handwriting, typed words, doodles, stickers, and pictures, then drag the outlined selection anywhere. Tap an item to move it on its own. Photos, stickers, and typed words resize from the bottom-right purple corner dot. Use ⌦ to delete selected items. You can also add a photo by dragging it here or uploading it.</p><div class="soft-divider"></div><div class="section-label">Offline kawaii stamps</div><div class="stickers-grid">${Object.keys(stickerSvgs).map(id=>`<button class="sticker-cell ${stamp===id && tool==='sticker'?'selected':''}" data-sticker="${id}"><img src="${stickerData[id]}" alt=""><span>${stickerNames[id]}</span></button>`).join('')}</div><div class="section-label">OpenMoji stamps · online</div><div class="stickers-grid">${openmoji.map(([id,name,code,fallback])=>`<button class="sticker-cell ${stamp===id && tool==='sticker'?'selected':''}" data-sticker="${id}"><img src="${stickerData[fallback]}" alt=""><span>${name.split(' ·')[0]}</span></button>`).join('')}</div><p class="subtle" style="margin-top:12px">Optional OpenMoji art: CC BY-SA 4.0, OpenMoji contributors. Original illustrated stickers work offline.</p>`;
+}else if(which==='save'){
+html=`<div class="action-stack"><button id="pngAction">↓ Save PNG picture</button><button id="backupAction">⇩ Backup editable board</button><button id="restoreAction">⇧ Restore backup</button></div><p class="subtle" style="margin-top:14px">PNG saves a finished image. Backup saves both boards with all editable objects, so you can continue later.</p>`;
+}else if(which==='help'){
+html=`<div class="section-label">The essentials</div><p class="subtle"><b>Tulip Board v5.5</b><br><br><b>Draw:</b> ✎ pen, ▰ highlighter, ✦ glitter, ⌫ eraser. All pen types, thickness, opacity, and colors are in 🎨 Ink.<br><br><b>Paper:</b> whiteboard/chalkboard, blank/grid/lined/dots.<br><br><b>Stickers:</b> open ♡ Art and tap a stamp, then tap anywhere to place it.<br><br><b>Photos:</b> drop a file onto the board, paste it, or use ♡ Art → Add photo.<br><br><b>Move:</b> Art → Box select & move. Draw a rectangle around handwritten words, typed labels, doodles, stickers or pictures, then drag the outline. Tap a single item to move it; drag a sticker/photo's bottom-right dot to resize.<br><br><b>Words:</b> Art → Add words opens a text editor. Choose from 15 fonts and a color, then tap <b>Add to board</b>. Drag the purple corner dot to resize your words directly on the board, just like photos and stickers.<br><br><b>Edit:</b> Undo, redo, clear selected, and clear all are directly in the left sidebar.<br><br><b>Files:</b> Open <b>Save</b>. <b>Save PNG</b> makes a finished picture. <b>Backup</b> saves both boards with editable objects to a JSON file. <b>Restore</b> imports that file so you can continue editing. Restore replaces your current boards, so back up first.<br><br><b>Hide controls:</b> Tap <b>Hide</b> to remove both toolbars while you keep drawing. Only the tiny flower button in the top-left remains; tap it or press Escape to bring the controls back.<br><br><b>Keyboard:</b> P pen · H highlighter · G glitter · E eraser · V select · ⌘Z undo · ⇧⌘Z redo.</p><div class="section-label">Credits</div><p class="subtle">Offline kawaii illustrations are original artwork for this app. Optional internet sticker assets: OpenMoji, CC BY-SA 4.0 · <a href="https://openmoji.org/" target="_blank" rel="noopener">openmoji.org</a> · <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">license</a>.</p>`;
+}
+el('panelBody').innerHTML=html;el('panelBody').querySelectorAll('[data-color]').forEach(b=>b.onclick=()=>{color=b.dataset.color;el('panelBody').querySelectorAll('[data-color]').forEach(n=>n.classList.toggle('selected',n===b));const picker=el('customColor');if(picker)picker.value=color;toast('Ink color selected')});
+el('panelBody').querySelectorAll('[data-paper]').forEach(b=>b.onclick=()=>{snapshot();current().paper=b.dataset.paper;drawPanel('paper');render();scheduleSave()});
+el('panelBody').querySelectorAll('[data-sticker]').forEach(b=>b.onclick=()=>{stamp=b.dataset.sticker;tool='sticker';el('panelBody').querySelectorAll('[data-sticker]').forEach(n=>n.classList.toggle('selected',n===b));const objSelect=el('objectSelect');if(objSelect)objSelect.classList.remove('selected');render();loadSticker(stamp).then(im=>{if(im)stickerRenderCache.set(stamp,im)})});
+const penBtn=el('inkPen'),hiBtn=el('inkHighlight'),glBtn=el('inkGlitter'),erBtn=el('inkEraser');const setInkTool=t=>{tool=t;clearSelection();el('panelBody').querySelectorAll('.brush-kind button').forEach(n=>n.classList.toggle('selected',n.id===({pen:'inkPen',highlighter:'inkHighlight',glitter:'inkGlitter',eraser:'inkEraser'}[t])));render()};if(penBtn)penBtn.onclick=()=>setInkTool('pen');if(hiBtn)hiBtn.onclick=()=>setInkTool('highlighter');if(glBtn)glBtn.onclick=()=>setInkTool('glitter');if(erBtn)erBtn.onclick=()=>setInkTool('eraser');const selectObj=el('objectSelect');if(selectObj)selectObj.onclick=()=>{tool='select';clearSelection();render();el('panelBody').querySelectorAll('[data-sticker]').forEach(b=>b.classList.remove('selected'));selectObj.classList.add('selected')};const pngAction=el('pngAction');if(pngAction)pngAction.onclick=exportPNG;const backupAction=el('backupAction');if(backupAction)backupAction.onclick=exportProject;const restoreAction=el('restoreAction');if(restoreAction)restoreAction.onclick=()=>{toast('Choose a Tulip Board backup JSON file to restore');el('projectInput').click()};
+const textAdd=el('addTypedText');if(textAdd)textAdd.onclick=()=>editTypedText(null);const textEdit=el('editTypedText');if(textEdit)textEdit.onclick=()=>{const obj=getObject(selectedIds[0]);if(obj?.type==='text')editTypedText(obj)};const cc=el('customColor');if(cc)cc.oninput=e=>{color=e.target.value;el('panelBody').querySelectorAll('[data-color]').forEach(n=>n.classList.remove('selected'))};
+const bs=el('brushSize');if(bs)bs.oninput=e=>{size=+e.target.value;el('sizeVal').textContent=size};const op=el('brushOpacity');if(op)op.oninput=e=>{opacity=+e.target.value/100;el('opacityVal').textContent=Math.round(opacity*100)+'%'};const po=el('pencilOnly');if(po)po.onchange=e=>{pencilOnly=e.target.checked;toast(pencilOnly?'Pencil-only mode on':'Touch drawing on')};
+const cph=el('choosePhoto');if(cph)cph.onclick=()=>el('photoInput').click();const pst=el('pasteHint');if(pst)pst.onclick=()=>{toast('Copy a photo, then use Paste (⌘V) on this page.')};}
+el('closePanel').onclick=hidePanel;
+document.querySelectorAll('[data-board]').forEach(b=>b.onclick=()=>setActive(b.dataset.board));
+el('paperBtn').onclick=()=>showPanel('paper');
+el('brushBtn').onclick=()=>showPanel('colors');
+el('objectsBtn').onclick=()=>showPanel('stickers');
+el('undoBtn').onclick=()=>restoreHistory('undo');
+el('redoBtn').onclick=()=>restoreHistory('redo');
+el('deleteBtn').onclick=deleteSelected;
+el('clearBtn').onclick=clearBoard;
+el('saveMenuBtn').onclick=()=>showPanel('save');
+el('helpBtn').onclick=()=>showPanel('help');
+function toggleFocus(force){
+ const next = typeof force==='boolean' ? force : !readonlyFocus;
+ if(next===readonlyFocus)return;
+ if(next){
+  // Selecting objects or placing stamps shouldn't leave focus mode unable to draw.
+  if(tool==='select'||tool==='sticker'){tool='pen';clearSelection();}
+  hidePanel();
+ }
+ readonlyFocus=next;
+ document.body.classList.toggle('focus-drawing',readonlyFocus);
+ const restoreButton=el('showUiBtn');
+ restoreButton.classList.toggle('hidden',!readonlyFocus);
+ restoreButton.setAttribute('aria-hidden',String(!readonlyFocus));
+ restoreButton.tabIndex=readonlyFocus?0:-1;
+ render();
+}
+el('hideUiBtn').onclick=()=>toggleFocus(true);el('showUiBtn').onclick=()=>toggleFocus(false);
+function downloadBlob(blob,name){const a=document.createElement('a');const url=URL.createObjectURL(blob);a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500)}
+function exportPNG(){const out=document.createElement('canvas');out.width=2400;out.height=1500;renderTo(out.getContext('2d'),active,{selection:false});out.toBlob(blob=>{if(blob)downloadBlob(blob,`tulip-${active}-${new Date().toISOString().slice(0,10)}.png`);else toast('Could not export image. Try project backup instead.');},'image/png');}
+
+function exportProject(){const blob=new Blob([JSON.stringify({format:'tulip-board-v1',docs,active,exported:new Date().toISOString()})],{type:'application/json'});downloadBlob(blob,'tulip-board-project.json');toast('Editable project downloaded ♡')}
+
+el('projectInput').addEventListener('change',async e=>{const file=e.target.files?.[0];if(!file)return;try{const parsed=JSON.parse(await file.text());if(parsed.format!=='tulip-board-v1'||!parsed.docs?.white||!parsed.docs?.chalk)throw Error('Invalid project');if(!confirm('Restore this backup? This replaces both current boards. Download a Backup first if you want to keep today’s work.'))return;docs=parsed.docs;active=parsed.active==='chalk'?'chalk':'white';history={white:[],chalk:[]};future={white:[],chalk:[]};photoCache.clear();clearSelection();render();scheduleSave();toast('Editable project restored')}catch(err){toast('That project file could not be opened')}e.target.value=''});
+function placeImage(data,x=W*.50,y=H*.50){const im=new Image();im.onload=()=>{snapshot();let scale=Math.min(640/im.width,500/im.height,1.5);const o={type:'image',id:newId(),src:data,x:clamp(x-im.width*scale/2,0,W-50),y:clamp(y-im.height*scale/2,0,H-50),w:im.width*scale,h:im.height*scale};photoCache.set(o.id,im);current().items.push(o);selectedId=o.id;selectedIds=[o.id];tool='select';hidePanel();render();scheduleSave();toast('Image added · drag to move or resize')};im.onerror=()=>toast('Unable to open this picture');im.src=data}
+async function fileToImage(file,point){if(!file||!file.type.startsWith('image/')){toast('Please choose an image file');return}if(file.size>28*1024*1024){toast('Choose an image under 28 MB');return}const blob=URL.createObjectURL(file);const im=new Image();im.onload=()=>{let mx=1700,scale=Math.min(1,mx/Math.max(im.naturalWidth,im.naturalHeight)),cn=document.createElement('canvas');cn.width=Math.max(1,Math.round(im.naturalWidth*scale));cn.height=Math.max(1,Math.round(im.naturalHeight*scale));let cc=cn.getContext('2d');cc.drawImage(im,0,0,cn.width,cn.height);const data=cn.toDataURL('image/jpeg',0.85);URL.revokeObjectURL(blob);placeImage(data,point?.x??W/2,point?.y??H/2)};im.onerror=()=>{URL.revokeObjectURL(blob);toast('Could not read image file')};im.src=blob}
+el('photoInput').onchange=async e=>{for(const file of e.target.files||[])await fileToImage(file);e.target.value=''};
+let dragCount=0;document.addEventListener('dragenter',e=>{e.preventDefault();dragCount++;el('dropzone').classList.add('active')});document.addEventListener('dragover',e=>{e.preventDefault();if(e.dataTransfer)e.dataTransfer.dropEffect='copy'});document.addEventListener('dragleave',e=>{e.preventDefault();dragCount--;if(dragCount<=0){dragCount=0;el('dropzone').classList.remove('active')}});
+document.addEventListener('drop',async e=>{e.preventDefault();dragCount=0;el('dropzone').classList.remove('active');const p=pos(e);const files=Array.from(e.dataTransfer?.files||[]).filter(f=>f.type.startsWith('image/'));if(files.length){for(const f of files)await fileToImage(f,p);return}const url=e.dataTransfer?.getData('text/uri-list')||e.dataTransfer?.getData('text/plain')||'';if(/^https?:\/\//.test(url)){try{const resp=await fetch(url,{mode:'cors'});if(!resp.ok)throw Error();const blob=await resp.blob();if(!blob.type.startsWith('image/'))throw Error();await fileToImage(new File([blob],'dropped-image.png',{type:blob.type}),p)}catch{toast('That website blocks image dragging. Save the image first or paste it.')}}});
+document.addEventListener('paste',async e=>{const items=Array.from(e.clipboardData?.items||[]);const image=items.find(i=>i.type.startsWith('image/'));if(image){e.preventDefault();const file=image.getAsFile();if(file)await fileToImage(file)}});
+document.addEventListener('keydown',e=>{if(e.target.closest('input,textarea,select'))return;const meta=e.metaKey||e.ctrlKey;if(meta&&e.key.toLowerCase()==='z'){e.preventDefault();restoreHistory(e.shiftKey?'redo':'undo');return}if(meta&&e.key.toLowerCase()==='y'){e.preventDefault();restoreHistory('redo');return}if(['Backspace','Delete'].includes(e.key)&&selectedIds.length){e.preventDefault();deleteSelected();return}if(e.key==='Escape'){if(readonlyFocus)toggleFocus();else hidePanel();return}const t={p:'pen',h:'highlighter',g:'glitter',e:'eraser',v:'select'}[e.key.toLowerCase()];if(t)selectTool(t)});
+// Saved locally in IndexedDB (supports large inserted images), without sending them to a server.
+let dbPromise=null;
+function openDB(){if(dbPromise)return dbPromise;dbPromise=new Promise((resolve,reject)=>{if(!('indexedDB' in window)){reject(Error('IndexedDB unavailable'));return}const req=indexedDB.open('tulip-board-local-v1',1);req.onupgradeneeded=()=>{req.result.createObjectStore('data')};req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error)});return dbPromise}
+async function persist(){try{const db=await openDB();await new Promise((resolve,reject)=>{const tr=db.transaction('data','readwrite');tr.objectStore('data').put({docs,active},'workspace');tr.oncomplete=resolve;tr.onerror=()=>reject(tr.error)})}catch{try{localStorage.setItem('tulip-board-fallback',JSON.stringify({docs,active}))}catch{toast('Storage is full — export a project backup to keep your art')}}}
+async function loadPersisted(){let data;try{const db=await openDB();data=await new Promise((resolve,reject)=>{const tr=db.transaction('data','readonly');const req=tr.objectStore('data').get('workspace');req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error)})}catch{try{data=JSON.parse(localStorage.getItem('tulip-board-fallback'))}catch{}}if(data?.docs?.white?.items&&data?.docs?.chalk?.items){docs=data.docs;active=data.active==='chalk'?'chalk':'white';}render()}
+// iPad can install via Add to Home Screen when hosted on HTTPS.
+if('serviceWorker' in navigator && location.protocol==='https:')window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+resized();loadPersisted();loadSticker('bunny').then(im=>{if(im)stickerRenderCache.set('bunny',im)});
+</script>
+</body>
+</html>
