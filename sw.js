@@ -1,5 +1,5 @@
-const CACHE='tulip-board-offline-v5-5';
-const FILES=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png','./icons/icon-512.png'];
+const CACHE='tulip-board-offline-v5-5-icons-20261103-pink-blue-whiteboard';
+const FILES=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png','./icons/icon-512.png','./icons/icon-maskable-512.png','./apple-touch-icon.png','./favicon-32.png','./favicon.ico'];
 self.addEventListener('install',event=>{
   event.waitUntil(caches.open(CACHE).then(c=>c.addAll(FILES)).then(()=>self.skipWaiting()));
 });
